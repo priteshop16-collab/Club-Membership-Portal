@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Membership Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500">
+
+    <!-- TOP NAVBAR -->
+    <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 font-bold text-lg text-white">
+                    CM
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight text-white leading-tight">ClubSync Portal</h1>
+                    <p class="text-xs text-slate-400">Monthly Dues & Roster</p>
+                </div>
+            </div>
+            
+            <div id="nav-user-profile" class="hidden items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <p id="nav-username" class="text-sm font-semibold text-slate-200">User</p>
+                    <p id="nav-role" class="text-xs text-indigo-400 font-medium">Member</p>
+                </div>
+                <button onclick="handleLogout()" class="px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white rounded-lg transition border border-slate-700">
+                    Sign Out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow flex items-center justify-center p-4 sm:p-6">
+
+        <!-- AUTHENTICATION SECTION (TOGGLE CARDS) -->
+        <div id="auth-section" class="w-full max-w-md mx-auto">
+            
+            <!-- Login Card -->
+            <div id="login-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl fade-in">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl font-bold tracking-tight text-white">Welcome Back</h2>
+                    <p class="text-sm text-slate-400 mt-1">Sign in to manage your monthly club dues</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Phone Number or User ID</label>
+                        <input type="text" id="login-identifier" required placeholder="e.g. 8240681586" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Password</label>
+                        <input type="password" id="login-password" required placeholder="••••••••" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div id="login-error" class="text-xs text-rose-400 hidden"></div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition text-sm mt-2">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center border-t border-slate-800/80 pt-5">
+                    <p class="text-xs text-slate-400">
+                        Don't have an account? 
+                        <button onclick="switchAuthView('signup')" class="text-indigo-400 font-semibold hover:text-indigo-300 ml-1 transition">Register here</button>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Sign Up Card -->
+            <div id="signup-card" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl hidden fade-in">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl font-bold tracking-tight text-white">Create Account</h2>
+                    <p class="text-sm text-slate-400 mt-1">Join the club member roster</p>
+                </div>
+
+                <form onsubmit="handleSignup(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Full Name</label>
+                        <input type="text" id="signup-name" required placeholder="e.g. Pritesh Ashtekar" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Mobile Number / User ID</label>
+                        <input type="text" id="signup-identifier" required placeholder="e.g. 8240681586" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Password</label>
+                        <input type="password" id="signup-password" required placeholder="••••••••" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div id="signup-error" class="text-xs text-rose-400 hidden"></div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition text-sm mt-2">
+                        Create Membership Account
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center border-t border-slate-800/80 pt-5">
+                    <p class="text-xs text-slate-400">
+                        Already a member? 
+                        <button onclick="switchAuthView('login')" class="text-indigo-400 font-semibold hover:text-indigo-300 ml-1 transition">Sign in</button>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboard-section" class="w-full max-w-5xl mx-auto hidden fade-in space-y-6">
+            
+            <!-- Welcome Header Banner -->
+            <div class="bg-gradient-to-r from-indigo-900/40 via-slate-900 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <h2 id="welcome-heading" class="text-2xl font-bold text-white tracking-tight">Welcome</h2>
+                    <p id="welcome-subtitle" class="text-xs text-slate-400 mt-1">Managing your monthly club contributions (₹100 / month)</p>
+                </div>
+                <div id="role-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    Member View
+                </div>
+            </div>
+
+            <!-- ADMIN STATS REPORT -->
+            <div id="admin-stats" class="grid grid-cols-1 sm:grid-cols-3 gap-4 hidden">
+                <button onclick="setFilter('all')" id="card-total" class="bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-2xl p-5 flex items-center justify-between shadow-lg text-left transition group">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider group-hover:text-indigo-300 transition">Total Members</p>
+                        <h3 id="stat-total" class="text-2xl font-bold text-white mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">👥</div>
+                </button>
+
+                <button onclick="setFilter('paid')" id="card-paid" class="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl p-5 flex items-center justify-between shadow-lg text-left transition group">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider group-hover:text-emerald-300 transition">Paid This Month (Click)</p>
+                        <h3 id="stat-paid" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">✅</div>
+                </button>
+
+                <button onclick="setFilter('unpaid')" id="card-unpaid" class="bg-slate-900 border border-slate-800 hover:border-rose-500/50 rounded-2xl p-5 flex items-center justify-between shadow-lg text-left transition group">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wider group-hover:text-rose-300 transition">Unpaid Dues (Click)</p>
+                        <h3 id="stat-unpaid" class="text-2xl font-bold text-rose-400 mt-1">0</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">⏳</div>
+                </button>
+            </div>
+
+            <!-- MEMBERS ROSTER / ADMIN TABLE -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+                <div class="p-5 sm:p-6 border-b border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 id="table-title" class="font-bold text-lg text-white">Member Roster & Payment Status</h3>
+                        <p id="table-subtitle" class="text-xs text-slate-400 mt-0.5">Track your payment records and monthly dues</p>
+                    </div>
+                    <div class="flex items-center space-x-3 w-full sm:w-auto">
+                        <input type="text" id="search-member" oninput="renderDashboard()" placeholder="Search..." 
+                            class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 w-full sm:w-56">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 bg-slate-950/50 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                <th class="py-3.5 px-6">Member Name / ID</th>
+                                <th class="py-3.5 px-6">Month / Period</th>
+                                <th class="py-3.5 px-6">Payment Date</th>
+                                <th class="py-3.5 px-6">Due Amount</th>
+                                <th class="py-3.5 px-6">Status</th>
+                                <th id="th-action" class="py-3.5 px-6 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roster-tbody" class="divide-y divide-slate-800/60 text-sm">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-900">
+        ClubSync Membership Dues Manager &bull; Admin & Member Portal
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const API_BASE = "http://127.0.0.1:5000/api";
+        let membersData = [];
+        let currentUser = null;
+        let currentFilter = 'all';
+
+        // Get Current Month and Year dynamically (e.g., "November 2026")[cite: 10]
+        const currentMonthYearString = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('club_current_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showDashboard();
+                } catch(e) {}
+            }
+        });
+
+        function switchAuthView(view) {
+            const loginCard = document.getElementById('login-card');
+            const signupCard = document.getElementById('signup-card');
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('signup-error').classList.add('hidden');
+
+            if (view === 'signup') {
+                loginCard.classList.add('hidden');
+                signupCard.classList.remove('hidden');
+            } else {
+                signupCard.classList.add('hidden');
+                loginCard.classList.remove('hidden');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const identifier = document.getElementById('login-identifier').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentUser = data.user;
+                    localStorage.setItem('club_current_user', JSON.stringify(currentUser));
+                    showDashboard();
+                } else {
+                    errorDiv.textContent = data.error || "Login failed.";
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.textContent = "Unable to connect to Flask server.";
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value.trim();
+            const identifier = document.getElementById('signup-identifier').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const errorDiv = document.getElementById('signup-error');
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, identifier, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentUser = data.user;
+                    localStorage.setItem('club_current_user', JSON.stringify(currentUser));
+                    showDashboard();
+                } else {
+                    errorDiv.textContent = data.error || "Registration failed.";
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorDiv.textContent = "Unable to connect to Flask server.";
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('club_current_user');
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('nav-user-profile').classList.remove('flex');
+            document.getElementById('nav-user-profile').classList.add('hidden');
+            switchAuthView('login');
+        }
+
+        async function showDashboard() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('nav-user-profile').classList.remove('hidden');
+            document.getElementById('nav-user-profile').classList.add('flex');
+
+            const firstName = currentUser.name.split(' ')[0];
+            document.getElementById('welcome-heading').textContent = `Welcome ${firstName}!`;
+            document.getElementById('nav-username').textContent = currentUser.name;
+
+            if (currentUser.isAdmin) {
+                document.getElementById('role-badge').textContent = "Administrator Dashboard";
+                document.getElementById('nav-role').textContent = "Admin";
+                document.getElementById('admin-stats').classList.remove('hidden');
+                document.getElementById('table-title').textContent = "Admin Report: All Members Roster";
+            } else {
+                document.getElementById('role-badge').textContent = "Member Dashboard";
+                document.getElementById('nav-role').textContent = "Member";
+                document.getElementById('admin-stats').classList.add('hidden');
+                document.getElementById('table-title').textContent = "My Monthly Dues Ledger";
+            }
+
+            await fetchMembersRoster();
+        }
+
+        async function fetchMembersRoster() {
+            try {
+                const response = await fetch(`${API_BASE}/members`);
+                if (response.ok) {
+                    membersData = await response.json();
+                    renderDashboard();
+                }
+            } catch (err) {
+                console.error("Failed to fetch roster", err);
+            }
+        }
+
+        // INSTANT OPTIMISTIC UI TOGGLE PAYMENT
+        async function togglePayment(identifier) {
+            if (!currentUser.isAdmin) return;
+
+            // 1. Immediately update UI state locally with zero lag
+            const member = membersData.find(m => m.id === identifier);
+            if (member) {
+                if (!member.paymentHistory || member.paymentHistory.length === 0) {
+                    member.paymentHistory = [{ month: currentMonthYearString, status: "Unpaid", date: "-", due: 100 }];
+                }
+                const currentStatus = member.paymentHistory[0].status;
+                if (currentStatus === 'Paid') {
+                    member.paymentHistory[0].status = 'Unpaid';
+                    member.paymentHistory[0].date = '-';
+                    member.paymentHistory[0].due = 100;
+                } else {
+                    member.paymentHistory[0].status = 'Paid';
+                    member.paymentHistory[0].date = new Date().toISOString().split('T')[0];
+                    member.paymentHistory[0].due = 0;
+                }
+                renderDashboard();
+            }
+
+            // 2. Sync silently with the backend database in the background
+            try {
+                await fetch(`${API_BASE}/members/${identifier}/toggle`, {
+                    method: 'PATCH'
+                });
+            } catch (err) {
+                console.error("Failed to sync toggle with server", err);
+                fetchMembersRoster(); // Revert on network failure
+            }
+        }
+
+        async function deleteMemberEntry(identifier) {
+            if (!currentUser.isAdmin) return;
+            if (!confirm(`Are you sure you want to delete member/duplicate entry: ${identifier}?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/members/${identifier}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    await fetchMembersRoster();
+                }
+            } catch (err) {
+                console.error("Failed to delete member", err);
+            }
+        }
+
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            
+            document.getElementById('card-total').className = `bg-slate-900 border ${filterType === 'all' ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-slate-800'} rounded-2xl p-5 flex items-center justify-between shadow-lg text-left transition group`;
+            document.getElementById('card-paid').className = `bg-slate-900 border ${filterType === 'paid' ? 'border-emerald-500 ring-1 ring-emerald-500' : 'border-slate-800'} rounded-2xl p-5 flex items-center justify-between shadow-lg text-left transition group`;
+            document.getElementById('card-unpaid').className = `bg-slate-900 border ${filterType === 'unpaid' ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-800'} rounded-2xl p-5 flex items-center justify-between shadow-lg text-left transition group`;
+
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            const tbody = document.getElementById('roster-tbody');
+            const searchQuery = document.getElementById('search-member').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            let targetList = membersData;
+            if (!currentUser.isAdmin) {
+                targetList = membersData.filter(m => m.id === currentUser.id);
+            } else {
+                const total = membersData.length;
+                const paid = membersData.filter(m => m.paymentHistory?.[0]?.status === 'Paid').length;
+                const unpaid = total - paid;
+
+                document.getElementById('stat-total').textContent = total;
+                document.getElementById('stat-paid').textContent = paid;
+                document.getElementById('stat-unpaid').textContent = unpaid;
+
+                if (currentFilter === 'paid') {
+                    targetList = membersData.filter(m => m.paymentHistory?.[0]?.status === 'Paid');
+                } else if (currentFilter === 'unpaid') {
+                    targetList = membersData.filter(m => m.paymentHistory?.[0]?.status !== 'Paid');
+                }
+            }
+
+            const filtered = targetList.filter(m => 
+                m.name.toLowerCase().includes(searchQuery) || m.id.toLowerCase().includes(searchQuery)
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500 text-sm">No records found matching filter/search.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(member => {
+                const history = member.paymentHistory && member.paymentHistory.length > 0 
+                    ? member.paymentHistory[0] 
+                    : { month: currentMonthYearString, status: "Unpaid", date: "-", due: 100 };
+
+                const periodDisplay = `${history.month || currentMonthYearString} <span class="block text-[11px] text-slate-500">(₹100)</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/30 transition";
+
+                let actionColumn = '';
+                let statusColumn = '';
+
+                statusColumn = history.status === 'Paid' 
+                    ? '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Paid</span>' 
+                    : '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">Unpaid</span>';
+
+                if (currentUser.isAdmin) {
+                    const isSelfAdmin = (member.id === currentUser.id);
+                    actionColumn = `
+                        <div class="flex items-center justify-end space-x-2">
+                            <button onclick="togglePayment('${member.id}')" 
+                                class="px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${history.status === 'Paid' ? 'bg-slate-800 hover:bg-slate-700 text-rose-300 border-slate-700' : 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500'}">
+                                ${history.status === 'Paid' ? 'Mark Unpaid' : 'Mark Paid'}
+                            </button>
+                            ${!isSelfAdmin ? `
+                                <button onclick="deleteMemberEntry('${member.id}')" 
+                                    class="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl transition border border-rose-500/30" title="Delete Member">
+                                    🗑️
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                } else {
+                    actionColumn = `<span class="text-xs text-slate-500">View Only</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="py-4 px-6 font-medium text-slate-200">
+                        ${member.name} ${member.isAdmin ? '<span class="ml-2 px-2 py-0.5 text-[10px] bg-indigo-500/20 text-indigo-400 rounded-full font-semibold border border-indigo-500/30">Admin</span>' : ''}
+                        <span class="block text-xs text-slate-400 font-mono">${member.id}</span>
+                    </td>
+                    <td class="py-4 px-6 text-slate-300 text-xs">${periodDisplay}</td>
+                    <td class="py-4 px-6 text-slate-400 text-xs font-mono">${history.date}</td>
+                    <td class="py-4 px-6 font-semibold text-amber-400">₹${history.due}</td>
+                    <td class="py-4 px-6">${statusColumn}</td>
+                    <td class="py-4 px-6 text-right">${actionColumn}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
