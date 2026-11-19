@@ -9,7 +9,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Replace with your actual credentials or configure in environment
 SUPABASE_URL = "https://sccnavjqbrqvnfxyqfbz.supabase.co"
-SUPABASE_KEY = "sb_publishable_5BQuUB91NMLzM5LNCW2I3Q_0vINIrYD"
+SUPABASE_KEY = "sb_secret_CpSh7gDsDX81faElVnTuaQ_NMOZYKgr"
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
